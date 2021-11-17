@@ -204,7 +204,7 @@ Placeholder.args = {
 export const Images = Template.bind({});
 Images.args = {
   defaultValue: `# Images
-![A caption](https://upload.wikimedia.org/wikipedia/commons/0/06/Davide-ragusa-gcDwzUGuUoI-unsplash.jpg)`,
+![A caption](https://upload.wikimedia.org/wikipedia/commons/0/06/Davide-ragusa-gcDwzUGuUoI-unsplash.jpg230x196)`,
 };
 
 export const Focused = Template.bind({});

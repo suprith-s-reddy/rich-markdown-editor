@@ -3,7 +3,8 @@ import { DownloadIcon } from "outline-icons";
 import { Plugin, TextSelection, NodeSelection } from "prosemirror-state";
 import { InputRule } from "prosemirror-inputrules";
 import styled from "styled-components";
-import ImageZoom from "react-medium-image-zoom";
+// import ImageZoom from "react-medium-image-zoom";
+import { Resizable } from "re-resizable";
 import getDataTransferFiles from "../lib/getDataTransferFiles";
 import uploadPlaceholderPlugin from "../lib/uploadPlaceholder";
 import insertFiles from "../commands/insertFiles";
@@ -115,6 +116,39 @@ const downloadImageNode = async node => {
   document.body.removeChild(link);
 };
 
+const ImageBox: React.FC<any> = ({ src, alt, title, node, handleResize, defaultWidth, defaultHeight }) => {
+  const [width, setWidth] = React.useState(defaultWidth || 150);
+  const [height, setHeight] = React.useState(defaultHeight || 150);
+  return (
+    <Resizable
+      size={{ width, height }}
+      onResizeStop={(e, direction, ref, d) => {
+        setWidth(width + d.width);
+        setHeight(height + d.height);
+
+        handleResize({
+          node,
+          size: {
+            width: width + d.width,
+            height: height + d.height,
+          },
+        });
+      }}
+    >
+      <img
+        src={src}
+        alt={alt}
+        title={title}
+        className="personal-image"
+        style={{
+          width: "100%",
+          height: "100%",
+        }}
+      />
+    </Resizable>
+  );
+};
+
 export default class Image extends Node {
   get name() {
     return "image";
@@ -132,6 +166,12 @@ export default class Image extends Node {
           default: null,
         },
         title: {
+          default: null,
+        },
+        width: {
+          default: null,
+        },
+        height: {
           default: null,
         },
       },
@@ -179,7 +219,14 @@ export default class Image extends Node {
           {
             class: className,
           },
-          ["img", { ...node.attrs, contentEditable: false }],
+          [
+            "img",
+            {
+              ...node.attrs,
+              style: { width: node.attrs.width, height: node.attrs.height },
+              contentEditable: false,
+            },
+          ],
           ["p", { class: "caption" }, 0],
         ];
       },
@@ -235,7 +282,6 @@ export default class Image extends Node {
 
   handleSelect = ({ getPos }) => event => {
     event.preventDefault();
-
     const { view } = this.editor;
     const $pos = view.state.doc.resolve(getPos());
     const transaction = view.state.tr.setSelection(new NodeSelection($pos));
@@ -248,9 +294,26 @@ export default class Image extends Node {
     downloadImageNode(node);
   };
 
+  handleResize = ({ node, size }) => {
+    const {
+      view: { dispatch, state },
+    } = this.editor;
+    const attrs = {
+      ...state.selection.node.attrs,
+      title: null,
+      width: size.width,
+      height: size.height,
+    };
+    const { selection } = state;
+    dispatch(state.tr.setNodeMarkup(selection.from, undefined, attrs));
+    return true;
+
+    // dispatch(state.tr.deleteSelection());
+  };
+
   component = props => {
     const { theme, isSelected } = props;
-    const { alt, src, title, layoutClass } = props.node.attrs;
+    const { alt, src, title, layoutClass, width, height } = props.node.attrs;
     const className = layoutClass ? `image image-${layoutClass}` : "image";
 
     return (
@@ -265,18 +328,14 @@ export default class Image extends Node {
               onClick={this.handleDownload(props)}
             />
           </Button>
-          <ImageZoom
-            image={{
-              src,
-              alt,
-              title,
-            }}
-            defaultStyles={{
-              overlay: {
-                backgroundColor: theme.background,
-              },
-            }}
-            shouldRespectMaxDimension
+          <ImageBox
+            src={src}
+            alt={alt}
+            title={title}
+            node={props.node}
+            defaultWidth={width}
+            defaultHeight={height}
+            handleResize={this.handleResize}
           />
         </ImageWrapper>
         <Caption
@@ -301,6 +360,12 @@ export default class Image extends Node {
       state.esc((node.attrs.alt || "").replace("\n", "") || "") +
       "](" +
       state.esc(node.attrs.src);
+    if (node.attrs.width) {
+      markdown += `${node.attrs.width}`;
+    }
+    if (node.attrs.height) {
+      markdown += `x${node.attrs.height}`;
+    }
     if (node.attrs.layoutClass) {
       markdown += ' "' + state.esc(node.attrs.layoutClass) + '"';
     } else if (node.attrs.title) {
@@ -314,9 +379,24 @@ export default class Image extends Node {
     return {
       node: "image",
       getAttrs: token => {
+        let src = token.attrGet("src");
+        const lastValues = src.split(".");
+        const widthStringValue = lastValues[lastValues.length - 1].split("x");
+        const width = widthStringValue[0].replace(/\D/g, "");
+        const height = widthStringValue[1].replace(/\D/g, "");
+
+        if (src && width) {
+          src = src.replace(`${width}`, "");
+        }
+        if (src && height) {
+          src = src.replace(`x${height}`, "");
+        }
+
         return {
-          src: token.attrGet("src"),
+          src,
           alt: (token.children[0] && token.children[0].content) || null,
+          width: width ? parseFloat(width) : null,
+          height: height ? parseFloat(height) : null,
           ...getLayoutAndTitle(token.attrGet("title")),
         };
       },
@@ -376,6 +456,16 @@ export default class Image extends Node {
         dispatch(transaction);
         return true;
       },
+      // setImageSize: () => (state, dispatch) => {
+      //   console.log("setImageSize: ", { state, dispatch });
+      //   // const attrs = {
+      //   //   ...state.selection.node.attrs,
+      //   //   title: null,
+      //   // };
+      //   // const { selection } = state;
+      //   // dispatch(state.tr.setNodeMarkup(selection.from, undefined, attrs));
+      //   return true;
+      // },
     };
   }
 
