@@ -2,6 +2,14 @@
 import { Plugin } from "prosemirror-state";
 import { InputRule } from "prosemirror-inputrules";
 import Node from "./Node";
+interface ISize {
+    width: number;
+    height: number;
+}
+interface IResizeProps {
+    node?: any;
+    size: ISize;
+}
 export default class Image extends Node {
     get name(): string;
     get schema(): {
@@ -15,6 +23,12 @@ export default class Image extends Node {
                 default: null;
             };
             title: {
+                default: null;
+            };
+            width: {
+                default: null;
+            };
+            height: {
                 default: null;
             };
         };
@@ -49,6 +63,7 @@ export default class Image extends Node {
     handleDownload: ({ node }: {
         node: any;
     }) => (event: any) => void;
+    handleResize: ({ size }: IResizeProps) => boolean;
     component: (props: any) => JSX.Element;
     toMarkdown(state: any, node: any): void;
     parseMarkdown(): {
@@ -58,16 +73,22 @@ export default class Image extends Node {
             title?: undefined;
             src: any;
             alt: any;
+            width: number | null;
+            height: number | null;
         } | {
             layoutClass: any;
             title?: undefined;
             src: any;
             alt: any;
+            width: number | null;
+            height: number | null;
         } | {
             title: any;
             layoutClass?: undefined;
             src: any;
             alt: any;
+            width: number | null;
+            height: number | null;
         };
     };
     commands({ type }: {
@@ -85,4 +106,5 @@ export default class Image extends Node {
     }): InputRule<any>[];
     get plugins(): Plugin<any, any>[];
 }
+export {};
 //# sourceMappingURL=Image.d.ts.map

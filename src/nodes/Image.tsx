@@ -116,7 +116,35 @@ const downloadImageNode = async node => {
   document.body.removeChild(link);
 };
 
-const ImageBox: React.FC<any> = ({ src, alt, title, node, handleResize, defaultWidth, defaultHeight }) => {
+interface ISize {
+  width: number;
+  height: number;
+}
+
+interface IResizeProps {
+  node?: any;
+  size: ISize;
+}
+
+interface IImageBoxProps {
+  src: string;
+  alt: string;
+  title: string;
+  node: any;
+  handleResize: (props: IResizeProps) => void;
+  defaultWidth: number;
+  defaultHeight: number;
+}
+
+const ImageBox: React.FC<IImageBoxProps> = ({
+  src,
+  alt,
+  title,
+  node,
+  handleResize,
+  defaultWidth,
+  defaultHeight,
+}) => {
   const [width, setWidth] = React.useState(defaultWidth || 150);
   const [height, setHeight] = React.useState(defaultHeight || 150);
   return (
@@ -294,11 +322,13 @@ export default class Image extends Node {
     downloadImageNode(node);
   };
 
-  handleResize = ({ node, size }) => {
+  handleResize = ({ size }: IResizeProps) => {
     const {
       view: { dispatch, state },
     } = this.editor;
     const attrs = {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       ...state.selection.node.attrs,
       title: null,
       width: size.width,
@@ -307,12 +337,10 @@ export default class Image extends Node {
     const { selection } = state;
     dispatch(state.tr.setNodeMarkup(selection.from, undefined, attrs));
     return true;
-
-    // dispatch(state.tr.deleteSelection());
   };
 
   component = props => {
-    const { theme, isSelected } = props;
+    const { isSelected } = props;
     const { alt, src, title, layoutClass, width, height } = props.node.attrs;
     const className = layoutClass ? `image image-${layoutClass}` : "image";
 

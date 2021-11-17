@@ -188,7 +188,7 @@ exports.Placeholder.args = {
 exports.Images = Template.bind({});
 exports.Images.args = {
     defaultValue: `# Images
-![A caption](https://upload.wikimedia.org/wikipedia/commons/0/06/Davide-ragusa-gcDwzUGuUoI-unsplash.jpg)`,
+![A caption](https://upload.wikimedia.org/wikipedia/commons/0/06/Davide-ragusa-gcDwzUGuUoI-unsplash.jpg230x196)`,
 };
 exports.Focused = Template.bind({});
 exports.Focused.args = {

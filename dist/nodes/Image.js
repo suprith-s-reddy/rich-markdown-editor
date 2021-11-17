@@ -27,7 +27,7 @@ const outline_icons_1 = require("outline-icons");
 const prosemirror_state_1 = require("prosemirror-state");
 const prosemirror_inputrules_1 = require("prosemirror-inputrules");
 const styled_components_1 = __importDefault(require("styled-components"));
-const react_medium_image_zoom_1 = __importDefault(require("react-medium-image-zoom"));
+const re_resizable_1 = require("re-resizable");
 const getDataTransferFiles_1 = __importDefault(require("../lib/getDataTransferFiles"));
 const uploadPlaceholder_1 = __importDefault(require("../lib/uploadPlaceholder"));
 const insertFiles_1 = __importDefault(require("../commands/insertFiles"));
@@ -107,6 +107,25 @@ const downloadImageNode = async (node) => {
     link.click();
     document.body.removeChild(link);
 };
+const ImageBox = ({ src, alt, title, node, handleResize, defaultWidth, defaultHeight, }) => {
+    const [width, setWidth] = React.useState(defaultWidth || 150);
+    const [height, setHeight] = React.useState(defaultHeight || 150);
+    return (React.createElement(re_resizable_1.Resizable, { size: { width, height }, onResizeStop: (e, direction, ref, d) => {
+            setWidth(width + d.width);
+            setHeight(height + d.height);
+            handleResize({
+                node,
+                size: {
+                    width: width + d.width,
+                    height: height + d.height,
+                },
+            });
+        } },
+        React.createElement("img", { src: src, alt: alt, title: title, className: "personal-image", style: {
+                width: "100%",
+                height: "100%",
+            } })));
+};
 class Image extends Node_1.default {
     constructor() {
         super(...arguments);
@@ -156,23 +175,22 @@ class Image extends Node_1.default {
             event.stopPropagation();
             downloadImageNode(node);
         };
+        this.handleResize = ({ size }) => {
+            const { view: { dispatch, state }, } = this.editor;
+            const attrs = Object.assign(Object.assign({}, state.selection.node.attrs), { title: null, width: size.width, height: size.height });
+            const { selection } = state;
+            dispatch(state.tr.setNodeMarkup(selection.from, undefined, attrs));
+            return true;
+        };
         this.component = props => {
-            const { theme, isSelected } = props;
-            const { alt, src, title, layoutClass } = props.node.attrs;
+            const { isSelected } = props;
+            const { alt, src, title, layoutClass, width, height } = props.node.attrs;
             const className = layoutClass ? `image image-${layoutClass}` : "image";
             return (React.createElement("div", { contentEditable: false, className: className },
                 React.createElement(ImageWrapper, { className: isSelected ? "ProseMirror-selectednode" : "", onClick: this.handleSelect(props) },
                     React.createElement(Button, null,
                         React.createElement(outline_icons_1.DownloadIcon, { color: "currentColor", onClick: this.handleDownload(props) })),
-                    React.createElement(react_medium_image_zoom_1.default, { image: {
-                            src,
-                            alt,
-                            title,
-                        }, defaultStyles: {
-                            overlay: {
-                                backgroundColor: theme.background,
-                            },
-                        }, shouldRespectMaxDimension: true })),
+                    React.createElement(ImageBox, { src: src, alt: alt, title: title, node: props.node, defaultWidth: width, defaultHeight: height, handleResize: this.handleResize })),
                 React.createElement(Caption, { onKeyDown: this.handleKeyDown(props), onBlur: this.handleBlur(props), className: "caption", tabIndex: -1, role: "textbox", contentEditable: true, suppressContentEditableWarning: true, "data-caption": this.options.dictionary.imageCaptionPlaceholder }, alt)));
         };
     }
@@ -191,6 +209,12 @@ class Image extends Node_1.default {
                     default: null,
                 },
                 title: {
+                    default: null,
+                },
+                width: {
+                    default: null,
+                },
+                height: {
                     default: null,
                 },
             },
@@ -237,7 +261,10 @@ class Image extends Node_1.default {
                     {
                         class: className,
                     },
-                    ["img", Object.assign(Object.assign({}, node.attrs), { contentEditable: false })],
+                    [
+                        "img",
+                        Object.assign(Object.assign({}, node.attrs), { style: { width: node.attrs.width, height: node.attrs.height }, contentEditable: false }),
+                    ],
                     ["p", { class: "caption" }, 0],
                 ];
             },
@@ -248,6 +275,12 @@ class Image extends Node_1.default {
             state.esc((node.attrs.alt || "").replace("\n", "") || "") +
             "](" +
             state.esc(node.attrs.src);
+        if (node.attrs.width) {
+            markdown += `${node.attrs.width}`;
+        }
+        if (node.attrs.height) {
+            markdown += `x${node.attrs.height}`;
+        }
         if (node.attrs.layoutClass) {
             markdown += ' "' + state.esc(node.attrs.layoutClass) + '"';
         }
@@ -261,7 +294,18 @@ class Image extends Node_1.default {
         return {
             node: "image",
             getAttrs: token => {
-                return Object.assign({ src: token.attrGet("src"), alt: (token.children[0] && token.children[0].content) || null }, getLayoutAndTitle(token.attrGet("title")));
+                let src = token.attrGet("src");
+                const lastValues = src.split(".");
+                const widthStringValue = lastValues[lastValues.length - 1].split("x");
+                const width = widthStringValue[0].replace(/\D/g, "");
+                const height = widthStringValue[1].replace(/\D/g, "");
+                if (src && width) {
+                    src = src.replace(`${width}`, "");
+                }
+                if (src && height) {
+                    src = src.replace(`x${height}`, "");
+                }
+                return Object.assign({ src, alt: (token.children[0] && token.children[0].content) || null, width: width ? parseFloat(width) : null, height: height ? parseFloat(height) : null }, getLayoutAndTitle(token.attrGet("title")));
             },
         };
     }
