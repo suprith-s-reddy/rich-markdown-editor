@@ -175,9 +175,10 @@ class Image extends Node_1.default {
             event.stopPropagation();
             downloadImageNode(node);
         };
-        this.handleResize = ({ size }) => {
+        this.handleResize = ({ node, size }) => {
             const { view: { dispatch, state }, } = this.editor;
-            const attrs = Object.assign(Object.assign({}, state.selection.node.attrs), { title: null, width: size.width, height: size.height });
+            const nodeAttrs = (node === null || node === void 0 ? void 0 : node.attrs) || {};
+            const attrs = Object.assign(Object.assign({}, nodeAttrs), { title: null, width: size.width, height: size.height });
             const { selection } = state;
             dispatch(state.tr.setNodeMarkup(selection.from, undefined, attrs));
             return true;

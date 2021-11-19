@@ -322,14 +322,13 @@ export default class Image extends Node {
     downloadImageNode(node);
   };
 
-  handleResize = ({ size }: IResizeProps) => {
+  handleResize = ({ node, size }: IResizeProps) => {
     const {
       view: { dispatch, state },
     } = this.editor;
+    const nodeAttrs = node?.attrs || {};
     const attrs = {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      ...state.selection.node.attrs,
+      ...nodeAttrs,
       title: null,
       width: size.width,
       height: size.height,

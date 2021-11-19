@@ -63,7 +63,7 @@ export default class Image extends Node {
     handleDownload: ({ node }: {
         node: any;
     }) => (event: any) => void;
-    handleResize: ({ size }: IResizeProps) => boolean;
+    handleResize: ({ node, size }: IResizeProps) => boolean;
     component: (props: any) => JSX.Element;
     toMarkdown(state: any, node: any): void;
     parseMarkdown(): {
