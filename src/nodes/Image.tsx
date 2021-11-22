@@ -122,7 +122,7 @@ interface ISize {
 }
 
 interface IResizeProps {
-  node?: any;
+  props?: any;
   size: ISize;
 }
 
@@ -130,7 +130,7 @@ interface IImageBoxProps {
   src: string;
   alt: string;
   title: string;
-  node: any;
+  props: any;
   handleResize: (props: IResizeProps) => void;
   defaultWidth: number;
   defaultHeight: number;
@@ -140,7 +140,7 @@ const ImageBox: React.FC<IImageBoxProps> = ({
   src,
   alt,
   title,
-  node,
+  props,
   handleResize,
   defaultWidth,
   defaultHeight,
@@ -155,7 +155,7 @@ const ImageBox: React.FC<IImageBoxProps> = ({
         setHeight(height + d.height);
 
         handleResize({
-          node,
+          props,
           size: {
             width: width + d.width,
             height: height + d.height,
@@ -313,7 +313,7 @@ export default class Image extends Node {
     const { view } = this.editor;
     const $pos = view.state.doc.resolve(getPos());
     const transaction = view.state.tr.setSelection(new NodeSelection($pos));
-    view.dispatch(transaction);
+    return view.dispatch(transaction);
   };
 
   handleDownload = ({ node }) => event => {
@@ -322,11 +322,11 @@ export default class Image extends Node {
     downloadImageNode(node);
   };
 
-  handleResize = ({ node, size }: IResizeProps) => {
+  handleResize = async ({ props, size }: IResizeProps) => {
     const {
       view: { dispatch, state },
     } = this.editor;
-    const nodeAttrs = node?.attrs || {};
+    const nodeAttrs = props?.node?.attrs || {};
     const attrs = {
       ...nodeAttrs,
       title: null,
@@ -347,7 +347,7 @@ export default class Image extends Node {
       <div contentEditable={false} className={className}>
         <ImageWrapper
           className={isSelected ? "ProseMirror-selectednode" : ""}
-          onClick={this.handleSelect(props)}
+          onMouseDown={this.handleSelect(props)}
         >
           <Button>
             <DownloadIcon
@@ -359,7 +359,7 @@ export default class Image extends Node {
             src={src}
             alt={alt}
             title={title}
-            node={props.node}
+            props={props}
             defaultWidth={width}
             defaultHeight={height}
             handleResize={this.handleResize}
@@ -387,12 +387,12 @@ export default class Image extends Node {
       state.esc((node.attrs.alt || "").replace("\n", "") || "") +
       "](" +
       state.esc(node.attrs.src);
-    if (node.attrs.width) {
-      markdown += `${node.attrs.width}`;
+
+    const { width, height } = node.attrs;
+    if (width || height) {
+      markdown += `?=${width}${height ? "x" + height : ""}`;
     }
-    if (node.attrs.height) {
-      markdown += `x${node.attrs.height}`;
-    }
+
     if (node.attrs.layoutClass) {
       markdown += ' "' + state.esc(node.attrs.layoutClass) + '"';
     } else if (node.attrs.title) {
@@ -407,20 +407,24 @@ export default class Image extends Node {
       node: "image",
       getAttrs: token => {
         let src = token.attrGet("src");
-        const lastValues = src.split(".");
-        const widthStringValue = lastValues[lastValues.length - 1].split("x");
-        const width = widthStringValue[0].replace(/\D/g, "");
-        const height = widthStringValue[1].replace(/\D/g, "");
+        const possibleImageSizeAttrs = src.split("?=");
+        let width, height;
 
-        if (src && width) {
-          src = src.replace(`${width}`, "");
-        }
-        if (src && height) {
-          src = src.replace(`x${height}`, "");
+        if (possibleImageSizeAttrs[1]) {
+          const widthStringValue = possibleImageSizeAttrs[1].split("x");
+          width = widthStringValue[0].replace(/\D/g, "");
+          height = widthStringValue[1].replace(/\D/g, "");
+
+          if (src && width) {
+            src = src.replace(`${width}`, "");
+          }
+          if (src && height) {
+            src = src.replace(`x${height}`, "");
+          }
         }
 
         return {
-          src,
+          src: possibleImageSizeAttrs[0],
           alt: (token.children[0] && token.children[0].content) || null,
           width: width ? parseFloat(width) : null,
           height: height ? parseFloat(height) : null,
@@ -482,17 +486,7 @@ export default class Image extends Node {
         const transaction = state.tr.insert(position, node);
         dispatch(transaction);
         return true;
-      },
-      // setImageSize: () => (state, dispatch) => {
-      //   console.log("setImageSize: ", { state, dispatch });
-      //   // const attrs = {
-      //   //   ...state.selection.node.attrs,
-      //   //   title: null,
-      //   // };
-      //   // const { selection } = state;
-      //   // dispatch(state.tr.setNodeMarkup(selection.from, undefined, attrs));
-      //   return true;
-      // },
+      }
     };
   }
 

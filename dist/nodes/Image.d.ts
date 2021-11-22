@@ -7,7 +7,7 @@ interface ISize {
     height: number;
 }
 interface IResizeProps {
-    node?: any;
+    props?: any;
     size: ISize;
 }
 export default class Image extends Node {
@@ -63,7 +63,7 @@ export default class Image extends Node {
     handleDownload: ({ node }: {
         node: any;
     }) => (event: any) => void;
-    handleResize: ({ node, size }: IResizeProps) => boolean;
+    handleResize: ({ props, size }: IResizeProps) => Promise<boolean>;
     component: (props: any) => JSX.Element;
     toMarkdown(state: any, node: any): void;
     parseMarkdown(): {

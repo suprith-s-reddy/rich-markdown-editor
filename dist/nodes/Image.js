@@ -107,14 +107,14 @@ const downloadImageNode = async (node) => {
     link.click();
     document.body.removeChild(link);
 };
-const ImageBox = ({ src, alt, title, node, handleResize, defaultWidth, defaultHeight, }) => {
+const ImageBox = ({ src, alt, title, props, handleResize, defaultWidth, defaultHeight, }) => {
     const [width, setWidth] = React.useState(defaultWidth || 150);
     const [height, setHeight] = React.useState(defaultHeight || 150);
     return (React.createElement(re_resizable_1.Resizable, { size: { width, height }, onResizeStop: (e, direction, ref, d) => {
             setWidth(width + d.width);
             setHeight(height + d.height);
             handleResize({
-                node,
+                props,
                 size: {
                     width: width + d.width,
                     height: height + d.height,
@@ -168,16 +168,17 @@ class Image extends Node_1.default {
             const { view } = this.editor;
             const $pos = view.state.doc.resolve(getPos());
             const transaction = view.state.tr.setSelection(new prosemirror_state_1.NodeSelection($pos));
-            view.dispatch(transaction);
+            return view.dispatch(transaction);
         };
         this.handleDownload = ({ node }) => event => {
             event.preventDefault();
             event.stopPropagation();
             downloadImageNode(node);
         };
-        this.handleResize = ({ node, size }) => {
+        this.handleResize = async ({ props, size }) => {
+            var _a;
             const { view: { dispatch, state }, } = this.editor;
-            const nodeAttrs = (node === null || node === void 0 ? void 0 : node.attrs) || {};
+            const nodeAttrs = ((_a = props === null || props === void 0 ? void 0 : props.node) === null || _a === void 0 ? void 0 : _a.attrs) || {};
             const attrs = Object.assign(Object.assign({}, nodeAttrs), { title: null, width: size.width, height: size.height });
             const { selection } = state;
             dispatch(state.tr.setNodeMarkup(selection.from, undefined, attrs));
@@ -188,10 +189,10 @@ class Image extends Node_1.default {
             const { alt, src, title, layoutClass, width, height } = props.node.attrs;
             const className = layoutClass ? `image image-${layoutClass}` : "image";
             return (React.createElement("div", { contentEditable: false, className: className },
-                React.createElement(ImageWrapper, { className: isSelected ? "ProseMirror-selectednode" : "", onClick: this.handleSelect(props) },
+                React.createElement(ImageWrapper, { className: isSelected ? "ProseMirror-selectednode" : "", onMouseDown: this.handleSelect(props) },
                     React.createElement(Button, null,
                         React.createElement(outline_icons_1.DownloadIcon, { color: "currentColor", onClick: this.handleDownload(props) })),
-                    React.createElement(ImageBox, { src: src, alt: alt, title: title, node: props.node, defaultWidth: width, defaultHeight: height, handleResize: this.handleResize })),
+                    React.createElement(ImageBox, { src: src, alt: alt, title: title, props: props, defaultWidth: width, defaultHeight: height, handleResize: this.handleResize })),
                 React.createElement(Caption, { onKeyDown: this.handleKeyDown(props), onBlur: this.handleBlur(props), className: "caption", tabIndex: -1, role: "textbox", contentEditable: true, suppressContentEditableWarning: true, "data-caption": this.options.dictionary.imageCaptionPlaceholder }, alt)));
         };
     }
@@ -276,11 +277,9 @@ class Image extends Node_1.default {
             state.esc((node.attrs.alt || "").replace("\n", "") || "") +
             "](" +
             state.esc(node.attrs.src);
-        if (node.attrs.width) {
-            markdown += `${node.attrs.width}`;
-        }
-        if (node.attrs.height) {
-            markdown += `x${node.attrs.height}`;
+        const { width, height } = node.attrs;
+        if (width || height) {
+            markdown += `?=${width}${height ? "x" + height : ""}`;
         }
         if (node.attrs.layoutClass) {
             markdown += ' "' + state.esc(node.attrs.layoutClass) + '"';
@@ -296,17 +295,20 @@ class Image extends Node_1.default {
             node: "image",
             getAttrs: token => {
                 let src = token.attrGet("src");
-                const lastValues = src.split(".");
-                const widthStringValue = lastValues[lastValues.length - 1].split("x");
-                const width = widthStringValue[0].replace(/\D/g, "");
-                const height = widthStringValue[1].replace(/\D/g, "");
-                if (src && width) {
-                    src = src.replace(`${width}`, "");
+                const possibleImageSizeAttrs = src.split("?=");
+                let width, height;
+                if (possibleImageSizeAttrs[1]) {
+                    const widthStringValue = possibleImageSizeAttrs[1].split("x");
+                    width = widthStringValue[0].replace(/\D/g, "");
+                    height = widthStringValue[1].replace(/\D/g, "");
+                    if (src && width) {
+                        src = src.replace(`${width}`, "");
+                    }
+                    if (src && height) {
+                        src = src.replace(`x${height}`, "");
+                    }
                 }
-                if (src && height) {
-                    src = src.replace(`x${height}`, "");
-                }
-                return Object.assign({ src, alt: (token.children[0] && token.children[0].content) || null, width: width ? parseFloat(width) : null, height: height ? parseFloat(height) : null }, getLayoutAndTitle(token.attrGet("title")));
+                return Object.assign({ src: possibleImageSizeAttrs[0], alt: (token.children[0] && token.children[0].content) || null, width: width ? parseFloat(width) : null, height: height ? parseFloat(height) : null }, getLayoutAndTitle(token.attrGet("title")));
             },
         };
     }
@@ -351,7 +353,7 @@ class Image extends Node_1.default {
                 const transaction = state.tr.insert(position, node);
                 dispatch(transaction);
                 return true;
-            },
+            }
         };
     }
     inputRules({ type }) {
