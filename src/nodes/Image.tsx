@@ -131,6 +131,7 @@ interface IImageBoxProps {
   alt: string;
   title: string;
   props: any;
+  readOnly?: boolean;
   handleResize: (props: IResizeProps) => void;
   defaultWidth: number;
   defaultHeight: number;
@@ -144,9 +145,27 @@ const ImageBox: React.FC<IImageBoxProps> = ({
   handleResize,
   defaultWidth,
   defaultHeight,
+  readOnly,
 }) => {
   const [width, setWidth] = React.useState(defaultWidth || 150);
   const [height, setHeight] = React.useState(defaultHeight || 150);
+
+  const image = (
+    <img
+      src={src}
+      alt={alt}
+      title={title}
+      className="personal-image"
+      style={{
+        width: "100%",
+        height: "100%",
+      }}
+    />
+  );
+  if (readOnly) {
+    return <div style={{ width, height }}>{image}</div>;
+  }
+
   return (
     <Resizable
       size={{ width, height }}
@@ -163,16 +182,7 @@ const ImageBox: React.FC<IImageBoxProps> = ({
         });
       }}
     >
-      <img
-        src={src}
-        alt={alt}
-        title={title}
-        className="personal-image"
-        style={{
-          width: "100%",
-          height: "100%",
-        }}
-      />
+      {image}
     </Resizable>
   );
 };
@@ -360,6 +370,7 @@ export default class Image extends Node {
             alt={alt}
             title={title}
             props={props}
+            readOnly={this.editor.props.readOnly}
             defaultWidth={width}
             defaultHeight={height}
             handleResize={this.handleResize}
@@ -486,7 +497,7 @@ export default class Image extends Node {
         const transaction = state.tr.insert(position, node);
         dispatch(transaction);
         return true;
-      }
+      },
     };
   }
 
