@@ -107,9 +107,16 @@ const downloadImageNode = async (node) => {
     link.click();
     document.body.removeChild(link);
 };
-const ImageBox = ({ src, alt, title, props, handleResize, defaultWidth, defaultHeight, }) => {
+const ImageBox = ({ src, alt, title, props, handleResize, defaultWidth, defaultHeight, readOnly, }) => {
     const [width, setWidth] = React.useState(defaultWidth || 150);
     const [height, setHeight] = React.useState(defaultHeight || 150);
+    const image = (React.createElement("img", { src: src, alt: alt, title: title, className: "personal-image", style: {
+            width: "100%",
+            height: "100%",
+        } }));
+    if (readOnly) {
+        return React.createElement("div", { style: { width, height } }, image);
+    }
     return (React.createElement(re_resizable_1.Resizable, { size: { width, height }, onResizeStop: (e, direction, ref, d) => {
             setWidth(width + d.width);
             setHeight(height + d.height);
@@ -120,11 +127,7 @@ const ImageBox = ({ src, alt, title, props, handleResize, defaultWidth, defaultH
                     height: height + d.height,
                 },
             });
-        } },
-        React.createElement("img", { src: src, alt: alt, title: title, className: "personal-image", style: {
-                width: "100%",
-                height: "100%",
-            } })));
+        } }, image));
 };
 class Image extends Node_1.default {
     constructor() {
@@ -192,7 +195,7 @@ class Image extends Node_1.default {
                 React.createElement(ImageWrapper, { className: isSelected ? "ProseMirror-selectednode" : "", onMouseDown: this.handleSelect(props) },
                     React.createElement(Button, null,
                         React.createElement(outline_icons_1.DownloadIcon, { color: "currentColor", onClick: this.handleDownload(props) })),
-                    React.createElement(ImageBox, { src: src, alt: alt, title: title, props: props, defaultWidth: width, defaultHeight: height, handleResize: this.handleResize })),
+                    React.createElement(ImageBox, { src: src, alt: alt, title: title, props: props, readOnly: this.editor.props.readOnly, defaultWidth: width, defaultHeight: height, handleResize: this.handleResize })),
                 React.createElement(Caption, { onKeyDown: this.handleKeyDown(props), onBlur: this.handleBlur(props), className: "caption", tabIndex: -1, role: "textbox", contentEditable: true, suppressContentEditableWarning: true, "data-caption": this.options.dictionary.imageCaptionPlaceholder }, alt)));
         };
     }
@@ -353,7 +356,7 @@ class Image extends Node_1.default {
                 const transaction = state.tr.insert(position, node);
                 dispatch(transaction);
                 return true;
-            }
+            },
         };
     }
     inputRules({ type }) {

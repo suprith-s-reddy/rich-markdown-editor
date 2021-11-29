@@ -1,11 +1,10 @@
 {
-  "name": "rich-markdown-editor",
-  "description": "A rich text editor with Markdown shortcuts",
+  "name": "@nijat13/rich-markdown-editor-with-resizer",
+  "description": "A rich text editor with Markdown shortcuts and Image resizer",
   "version": "11.19.3",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "license": "BSD-3-Clause",
-  "funding": "https://github.com/sponsors/outline",
   "scripts": {
     "test": "jest",
     "lint": "tsc --noEmit && eslint '*/**/*.{js,ts,tsx}' --quiet",
@@ -117,7 +116,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/outline/rich-markdown-editor.git"
+    "url": "git+https://github.com/nijat13/rich-markdown-editor.git"
   },
   "keywords": [
     "editor",
@@ -125,9 +124,12 @@
     "text",
     "wysiwyg"
   ],
-  "author": "Tom Moor <tom.moor@gmail.com>",
+  "author": "Nijat Ahmadov <nicataxmedov13@gmail.com>",
   "bugs": {
-    "url": "https://github.com/outline/rich-markdown-editor/issues"
+    "url": "https://github.com/nijat13/rich-markdown-editor/issues"
   },
-  "homepage": "https://github.com/outline/rich-markdown-editor#readme"
+  "homepage": "https://github.com/nijat13/rich-markdown-editor#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/ampolon"
+  }
 }
