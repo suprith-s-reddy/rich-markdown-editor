@@ -130,6 +130,6 @@
   },
   "homepage": "https://github.com/nijat13/rich-markdown-editor#readme",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/ampolon"
+    "registry": "https://npm.pkg.github.com/nijat13"
   }
 }
