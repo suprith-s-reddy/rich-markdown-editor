@@ -1,7 +1,7 @@
 {
   "name": "@ampolon/rich-markdown-editor-v2",
   "description": "A rich text editor with Markdown shortcuts and Image resizer",
-  "version": "11.19.5",
+  "version": "11.19.6",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "license": "BSD-3-Clause",
