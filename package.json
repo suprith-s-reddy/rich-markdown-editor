@@ -1,7 +1,7 @@
 {
-  "name": "@nijat13/rich-markdown-editor-with-resizer",
+  "name": "@ampolon/rich-markdown-editor-v2",
   "description": "A rich text editor with Markdown shortcuts and Image resizer",
-  "version": "11.19.4",
+  "version": "11.19.5",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "license": "BSD-3-Clause",
@@ -116,20 +116,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nijat13/rich-markdown-editor.git"
+    "url": "git+https://github.com/suprith-s-reddy/rich-markdown-editor.git"
   },
-  "keywords": [
-    "editor",
-    "markdown",
-    "text",
-    "wysiwyg"
-  ],
-  "author": "Nijat Ahmadov <nicataxmedov13@gmail.com>",
+  "author": "",
   "bugs": {
-    "url": "https://github.com/nijat13/rich-markdown-editor/issues"
+    "url": "https://github.com/suprith-s-reddy/rich-markdown-editor/issues"
   },
-  "homepage": "https://github.com/nijat13/rich-markdown-editor#readme",
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/nijat13"
-  }
+  "homepage": "https://github.com/suprith-s-reddy/rich-markdown-editor#readme"
 }
