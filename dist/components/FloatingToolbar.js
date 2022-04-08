@@ -24,10 +24,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(require("react"));
 const react_portal_1 = require("react-portal");
+const styled_components_1 = __importDefault(require("styled-components"));
 const useComponentSize_1 = __importDefault(require("../hooks/useComponentSize"));
 const useMediaQuery_1 = __importDefault(require("../hooks/useMediaQuery"));
 const useViewportHeight_1 = __importDefault(require("../hooks/useViewportHeight"));
-const styled_components_1 = __importDefault(require("styled-components"));
+const isVideo_1 = __importDefault(require("../queries/isVideo"));
 const SSR = typeof window === "undefined";
 const defaultPosition = {
     left: -1000,
@@ -83,7 +84,9 @@ function usePosition({ menuRef, isSelectingText, props }) {
     const isImageSelection = selection.node && selection.node.type.name === "image";
     if (isImageSelection) {
         const element = view.nodeDOM(selection.from);
-        const imageElement = element.getElementsByTagName("img")[0];
+        const imageElement = !isVideo_1.default(selection.node.attrs.src)
+            ? element.getElementsByTagName("img")[0]
+            : element.getElementsByTagName("video")[0];
         const { left, top, width } = imageElement.getBoundingClientRect();
         return {
             left: Math.round(left + width / 2 + window.scrollX - menuWidth / 2),
@@ -141,9 +144,9 @@ const Wrapper = styled_components_1.default.div `
   will-change: opacity, transform;
   padding: 8px 16px;
   position: absolute;
-  z-index: ${props => props.theme.zIndex + 100};
+  z-index: ${(props) => props.theme.zIndex + 100};
   opacity: 0;
-  background-color: ${props => props.theme.toolbarBackground};
+  background-color: ${(props) => props.theme.toolbarBackground};
   border-radius: 4px;
   transform: scale(0.95);
   transition: opacity 150ms cubic-bezier(0.175, 0.885, 0.32, 1.275),
@@ -161,12 +164,12 @@ const Wrapper = styled_components_1.default.div `
     width: 24px;
     height: 24px;
     transform: translateX(-50%) rotate(45deg);
-    background: ${props => props.theme.toolbarBackground};
+    background: ${(props) => props.theme.toolbarBackground};
     border-radius: 3px;
     z-index: -1;
     position: absolute;
     bottom: -2px;
-    left: calc(50% - ${props => props.offset || 0}px);
+    left: calc(50% - ${(props) => props.offset || 0}px);
     pointer-events: none;
   }
 

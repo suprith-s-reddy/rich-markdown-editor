@@ -21,14 +21,16 @@ const uploadPlaceholder = new Plugin({
 
         const isFileVideo = isVideo(action.add.file.name);
 
-        const media = document.createElement(isFileVideo ? "video" : "img");
-        media.src = URL.createObjectURL(action.add.file);
-
+        let media;
         if (isFileVideo) {
+          media = document.createElement("video");
           media.style.width = "100%";
           media.style.height = "100%";
           media.controls = true;
+        } else {
+          media = document.createElement("img");
         }
+        media.src = URL.createObjectURL(action.add.file);
 
         element.appendChild(media);
 

@@ -1,7 +1,7 @@
-import * as React from "react";
 import { EditorView } from "prosemirror-view";
-import { EmbedDescriptor, MenuItem } from "../types";
+import * as React from "react";
 import baseDictionary from "../dictionary";
+import { EmbedDescriptor, MenuItem } from "../types";
 export declare type Props<T extends MenuItem = MenuItem> = {
     rtl: boolean;
     isActive: boolean;
@@ -9,7 +9,7 @@ export declare type Props<T extends MenuItem = MenuItem> = {
     dictionary: typeof baseDictionary;
     view: EditorView;
     search: string;
-    uploadImage?: (file: File) => Promise<string>;
+    uploadMedia?: (file: File) => Promise<string>;
     onImageUploadStart?: () => void;
     onImageUploadStop?: () => void;
     onShowToast?: (message: string, id: string) => void;

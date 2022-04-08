@@ -33,26 +33,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __importStar(require("react"));
-const react_portal_1 = require("react-portal");
 const some_1 = __importDefault(require("lodash/some"));
 const prosemirror_state_1 = require("prosemirror-state");
-const tableCol_1 = __importDefault(require("../menus/tableCol"));
-const tableRow_1 = __importDefault(require("../menus/tableRow"));
-const table_1 = __importDefault(require("../menus/table"));
+const React = __importStar(require("react"));
+const react_portal_1 = require("react-portal");
+const createAndInsertLink_1 = __importDefault(require("../commands/createAndInsertLink"));
+const filterExcessSeparators_1 = __importDefault(require("../lib/filterExcessSeparators"));
+const divider_1 = __importDefault(require("../menus/divider"));
 const formatting_1 = __importDefault(require("../menus/formatting"));
 const image_1 = __importDefault(require("../menus/image"));
-const divider_1 = __importDefault(require("../menus/divider"));
+const table_1 = __importDefault(require("../menus/table"));
+const tableCol_1 = __importDefault(require("../menus/tableCol"));
+const tableRow_1 = __importDefault(require("../menus/tableRow"));
+const getColumnIndex_1 = __importDefault(require("../queries/getColumnIndex"));
+const getMarkRange_1 = __importDefault(require("../queries/getMarkRange"));
+const getRowIndex_1 = __importDefault(require("../queries/getRowIndex"));
+const isMarkActive_1 = __importDefault(require("../queries/isMarkActive"));
+const isNodeActive_1 = __importDefault(require("../queries/isNodeActive"));
 const FloatingToolbar_1 = __importDefault(require("./FloatingToolbar"));
 const LinkEditor_1 = __importDefault(require("./LinkEditor"));
 const ToolbarMenu_1 = __importDefault(require("./ToolbarMenu"));
-const filterExcessSeparators_1 = __importDefault(require("../lib/filterExcessSeparators"));
-const isMarkActive_1 = __importDefault(require("../queries/isMarkActive"));
-const getMarkRange_1 = __importDefault(require("../queries/getMarkRange"));
-const isNodeActive_1 = __importDefault(require("../queries/isNodeActive"));
-const getColumnIndex_1 = __importDefault(require("../queries/getColumnIndex"));
-const getRowIndex_1 = __importDefault(require("../queries/getRowIndex"));
-const createAndInsertLink_1 = __importDefault(require("../commands/createAndInsertLink"));
 function isVisible(props) {
     const { view } = props;
     const { selection } = view.state;
@@ -66,12 +66,15 @@ function isVisible(props) {
     if (selection.node && selection.node.type.name === "image") {
         return true;
     }
+    if (selection.node && selection.node.type.name === "video") {
+        return true;
+    }
     if (selection.node)
         return false;
     const slice = selection.content();
     const fragment = slice.content;
     const nodes = fragment.content;
-    return some_1.default(nodes, n => n.content.size);
+    return some_1.default(nodes, (n) => n.content.size);
 }
 class SelectionToolbar extends React.Component {
     constructor() {
@@ -157,6 +160,7 @@ class SelectionToolbar extends React.Component {
         const link = isMarkActive_1.default(state.schema.marks.link)(state);
         const range = getMarkRange_1.default(selection.$from, state.schema.marks.link);
         const isImageSelection = selection.node && selection.node.type.name === "image";
+        const isVideoSelection = selection.node && selection.node.type.name === "video";
         let isTextSelection = false;
         let items = [];
         if (isTableSelection) {
@@ -178,7 +182,7 @@ class SelectionToolbar extends React.Component {
             items = formatting_1.default(state, isTemplate, dictionary);
             isTextSelection = true;
         }
-        items = items.filter(item => {
+        items = items.filter((item) => {
             if (item.name === "separator")
                 return true;
             if (item.name && !this.props.commands[item.name])

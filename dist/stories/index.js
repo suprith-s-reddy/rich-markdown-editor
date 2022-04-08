@@ -23,8 +23,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const React = __importStar(require("react"));
-const theme_1 = require("../styles/theme");
 const __1 = __importDefault(require(".."));
+const isVideo_1 = __importDefault(require("../queries/isVideo"));
+const theme_1 = require("../styles/theme");
 const docSearchResults = [
     {
         title: "Hiring",
@@ -75,7 +76,7 @@ const embeds = [
         keywords: "youtube video tube google",
         defaultHidden: true,
         icon: () => (React.createElement("img", { src: "https://upload.wikimedia.org/wikipedia/commons/7/75/YouTube_social_white_squircle_%282017%29.svg", width: 24, height: 24 })),
-        matcher: url => {
+        matcher: (url) => {
             return url.match(/(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([a-zA-Z0-9_-]{11})$/i);
         },
         component: YoutubeEmbed,
@@ -88,7 +89,7 @@ function Example(props) {
             ? theme_1.dark.background
             : theme_1.light.background;
     return (React.createElement("div", { style: { padding: "1em 2em" } },
-        React.createElement(__1.default, Object.assign({ onCreateLink: title => {
+        React.createElement(__1.default, Object.assign({ onCreateLink: (title) => {
                 return new Promise((resolve, reject) => {
                     setTimeout(() => {
                         if (title !== "error") {
@@ -101,15 +102,16 @@ function Example(props) {
                 });
             }, onSearchLink: async (term) => {
                 console.log("Searched link: ", term);
-                return new Promise(resolve => {
+                return new Promise((resolve) => {
                     setTimeout(() => {
-                        resolve(docSearchResults.filter(result => result.title.toLowerCase().includes(term.toLowerCase())));
+                        resolve(docSearchResults.filter((result) => result.title.toLowerCase().includes(term.toLowerCase())));
                     }, Math.random() * 500);
                 });
-            }, uploadImage: file => {
-                console.log("File upload triggered: ", file);
-                return new Promise(resolve => {
-                    setTimeout(() => resolve(URL.createObjectURL(file)), 1500);
+            }, uploadMedia: (file) => {
+                const imageUrl = URL.createObjectURL(file);
+                const fileUrl = isVideo_1.default(file.name) ? imageUrl + ".mp4" : imageUrl;
+                return new Promise((resolve) => {
+                    setTimeout(() => resolve(fileUrl), 1500);
                 });
             }, embeds: embeds }, props))));
 }

@@ -1,6 +1,6 @@
 /// <reference types="react" />
-import { Plugin } from "prosemirror-state";
 import { InputRule } from "prosemirror-inputrules";
+import { Plugin } from "prosemirror-state";
 import Node from "./Node";
 interface ISize {
     width: number;
@@ -37,14 +37,22 @@ export default class Image extends Node {
         group: string;
         selectable: boolean;
         draggable: boolean;
-        parseDOM: {
+        parseDOM: ({
             tag: string;
-            getAttrs: (dom: HTMLImageElement) => {
+            getAttrs: (dom: HTMLDivElement) => {
+                src: string | null;
+                alt: string | null;
+                title: string | null;
+                layoutClass: string | null;
+            };
+        } | {
+            tag: string;
+            getAttrs: (dom: HTMLImageElement | HTMLVideoElement) => {
                 src: string | null;
                 alt: string | null;
                 title: string | null;
             };
-        }[];
+        })[];
         toDOM: (node: any) => (string | any[] | {
             class: string;
         })[];

@@ -1,7 +1,7 @@
-import * as React from "react";
 import { EditorView } from "prosemirror-view";
-import { SearchResult } from "./LinkEditor";
+import * as React from "react";
 import baseDictionary from "../dictionary";
+import { SearchResult } from "./LinkEditor";
 declare type Props = {
     dictionary: typeof baseDictionary;
     tooltip: typeof React.Component | React.FC<any>;

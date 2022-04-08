@@ -31,7 +31,7 @@ export declare const base: {
     heading: string;
     hr: string;
     image: string;
-    imageUploadError: string;
+    mediaUploadError: string;
     imageCaptionPlaceholder: string;
     info: string;
     infoNotice: string;

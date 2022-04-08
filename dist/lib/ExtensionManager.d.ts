@@ -1,9 +1,9 @@
-import { Schema } from "prosemirror-model";
+import { PluginSimple } from "markdown-it";
 import { MarkdownParser } from "prosemirror-markdown";
-import { MarkdownSerializer } from "./markdown/serializer";
+import { Schema } from "prosemirror-model";
 import Editor from "../";
 import Extension from "./Extension";
-import { PluginSimple } from "markdown-it";
+import { MarkdownSerializer } from "./markdown/serializer";
 export default class ExtensionManager {
     extensions: Extension[];
     constructor(extensions?: Extension[], editor?: Editor);

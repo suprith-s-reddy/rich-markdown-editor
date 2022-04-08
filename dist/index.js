@@ -22,41 +22,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.theme = exports.Extension = exports.renderToHtml = exports.serializer = exports.parser = exports.schema = void 0;
-const React = __importStar(require("react"));
+exports.theme = exports.serializer = exports.schema = exports.renderToHtml = exports.parser = exports.Extension = void 0;
 const memoize_1 = __importDefault(require("lodash/memoize"));
-const prosemirror_state_1 = require("prosemirror-state");
+const prosemirror_commands_1 = require("prosemirror-commands");
 const prosemirror_dropcursor_1 = require("prosemirror-dropcursor");
 const prosemirror_gapcursor_1 = require("prosemirror-gapcursor");
-const prosemirror_view_1 = require("prosemirror-view");
-const prosemirror_model_1 = require("prosemirror-model");
 const prosemirror_inputrules_1 = require("prosemirror-inputrules");
 const prosemirror_keymap_1 = require("prosemirror-keymap");
-const prosemirror_commands_1 = require("prosemirror-commands");
+const prosemirror_model_1 = require("prosemirror-model");
+const prosemirror_state_1 = require("prosemirror-state");
 const prosemirror_utils_1 = require("prosemirror-utils");
+const prosemirror_view_1 = require("prosemirror-view");
+const React = __importStar(require("react"));
 const styled_components_1 = require("styled-components");
-const theme_1 = require("./styles/theme");
-const dictionary_1 = __importDefault(require("./dictionary"));
-const Flex_1 = __importDefault(require("./components/Flex"));
-const SelectionToolbar_1 = __importDefault(require("./components/SelectionToolbar"));
 const BlockMenu_1 = __importDefault(require("./components/BlockMenu"));
 const EmojiMenu_1 = __importDefault(require("./components/EmojiMenu"));
+const Flex_1 = __importDefault(require("./components/Flex"));
 const LinkToolbar_1 = __importDefault(require("./components/LinkToolbar"));
+const SelectionToolbar_1 = __importDefault(require("./components/SelectionToolbar"));
 const Tooltip_1 = __importDefault(require("./components/Tooltip"));
-const ExtensionManager_1 = __importDefault(require("./lib/ExtensionManager"));
+const dictionary_1 = __importDefault(require("./dictionary"));
 const ComponentView_1 = __importDefault(require("./lib/ComponentView"));
+const ExtensionManager_1 = __importDefault(require("./lib/ExtensionManager"));
 const headingToSlug_1 = __importDefault(require("./lib/headingToSlug"));
-const editor_1 = require("./styles/editor");
-const Doc_1 = __importDefault(require("./nodes/Doc"));
-const Text_1 = __importDefault(require("./nodes/Text"));
+const Bold_1 = __importDefault(require("./marks/Bold"));
+const Code_1 = __importDefault(require("./marks/Code"));
+const Highlight_1 = __importDefault(require("./marks/Highlight"));
+const Italic_1 = __importDefault(require("./marks/Italic"));
+const Link_1 = __importDefault(require("./marks/Link"));
+const Placeholder_1 = __importDefault(require("./marks/Placeholder"));
+const Strikethrough_1 = __importDefault(require("./marks/Strikethrough"));
+const Underline_1 = __importDefault(require("./marks/Underline"));
 const Blockquote_1 = __importDefault(require("./nodes/Blockquote"));
 const BulletList_1 = __importDefault(require("./nodes/BulletList"));
+const CheckboxItem_1 = __importDefault(require("./nodes/CheckboxItem"));
+const CheckboxList_1 = __importDefault(require("./nodes/CheckboxList"));
 const CodeBlock_1 = __importDefault(require("./nodes/CodeBlock"));
 const CodeFence_1 = __importDefault(require("./nodes/CodeFence"));
-const CheckboxList_1 = __importDefault(require("./nodes/CheckboxList"));
-const Emoji_1 = __importDefault(require("./nodes/Emoji"));
-const CheckboxItem_1 = __importDefault(require("./nodes/CheckboxItem"));
+const Doc_1 = __importDefault(require("./nodes/Doc"));
 const Embed_1 = __importDefault(require("./nodes/Embed"));
+const Emoji_1 = __importDefault(require("./nodes/Emoji"));
 const HardBreak_1 = __importDefault(require("./nodes/HardBreak"));
 const Heading_1 = __importDefault(require("./nodes/Heading"));
 const HorizontalRule_1 = __importDefault(require("./nodes/HorizontalRule"));
@@ -69,31 +74,26 @@ const Table_1 = __importDefault(require("./nodes/Table"));
 const TableCell_1 = __importDefault(require("./nodes/TableCell"));
 const TableHeadCell_1 = __importDefault(require("./nodes/TableHeadCell"));
 const TableRow_1 = __importDefault(require("./nodes/TableRow"));
-const Bold_1 = __importDefault(require("./marks/Bold"));
-const Code_1 = __importDefault(require("./marks/Code"));
-const Highlight_1 = __importDefault(require("./marks/Highlight"));
-const Italic_1 = __importDefault(require("./marks/Italic"));
-const Link_1 = __importDefault(require("./marks/Link"));
-const Strikethrough_1 = __importDefault(require("./marks/Strikethrough"));
-const Placeholder_1 = __importDefault(require("./marks/Placeholder"));
-const Underline_1 = __importDefault(require("./marks/Underline"));
+const Text_1 = __importDefault(require("./nodes/Text"));
 const BlockMenuTrigger_1 = __importDefault(require("./plugins/BlockMenuTrigger"));
 const EmojiTrigger_1 = __importDefault(require("./plugins/EmojiTrigger"));
 const Folding_1 = __importDefault(require("./plugins/Folding"));
 const History_1 = __importDefault(require("./plugins/History"));
 const Keys_1 = __importDefault(require("./plugins/Keys"));
 const MaxLength_1 = __importDefault(require("./plugins/MaxLength"));
+const PasteHandler_1 = __importDefault(require("./plugins/PasteHandler"));
 const Placeholder_2 = __importDefault(require("./plugins/Placeholder"));
 const SmartText_1 = __importDefault(require("./plugins/SmartText"));
 const TrailingNode_1 = __importDefault(require("./plugins/TrailingNode"));
-const PasteHandler_1 = __importDefault(require("./plugins/PasteHandler"));
-var server_1 = require("./server");
-Object.defineProperty(exports, "schema", { enumerable: true, get: function () { return server_1.schema; } });
-Object.defineProperty(exports, "parser", { enumerable: true, get: function () { return server_1.parser; } });
-Object.defineProperty(exports, "serializer", { enumerable: true, get: function () { return server_1.serializer; } });
-Object.defineProperty(exports, "renderToHtml", { enumerable: true, get: function () { return server_1.renderToHtml; } });
+const editor_1 = require("./styles/editor");
+const theme_1 = require("./styles/theme");
 var Extension_1 = require("./lib/Extension");
 Object.defineProperty(exports, "Extension", { enumerable: true, get: function () { return __importDefault(Extension_1).default; } });
+var server_1 = require("./server");
+Object.defineProperty(exports, "parser", { enumerable: true, get: function () { return server_1.parser; } });
+Object.defineProperty(exports, "renderToHtml", { enumerable: true, get: function () { return server_1.renderToHtml; } });
+Object.defineProperty(exports, "schema", { enumerable: true, get: function () { return server_1.schema; } });
+Object.defineProperty(exports, "serializer", { enumerable: true, get: function () { return server_1.serializer; } });
 exports.theme = theme_1.light;
 class RichMarkdownEditor extends React.PureComponent {
     constructor() {
@@ -188,7 +188,7 @@ class RichMarkdownEditor extends React.PureComponent {
         this.getHeadings = () => {
             const headings = [];
             const previouslySeen = {};
-            this.view.state.doc.forEach(node => {
+            this.view.state.doc.forEach((node) => {
                 if (node.type.name === "heading") {
                     const slug = headingToSlug_1.default(node);
                     let id = slug;
@@ -313,7 +313,7 @@ class RichMarkdownEditor extends React.PureComponent {
                 new HorizontalRule_1.default(),
                 new Image_1.default({
                     dictionary,
-                    uploadImage: this.props.uploadImage,
+                    uploadMedia: this.props.uploadMedia,
                     onImageUploadStart: this.props.onImageUploadStart,
                     onImageUploadStop: this.props.onImageUploadStop,
                     onShowToast: this.props.onShowToast,
@@ -372,7 +372,7 @@ class RichMarkdownEditor extends React.PureComponent {
                 new MaxLength_1.default({
                     maxLength: this.props.maxLength,
                 }),
-            ].filter(extension => {
+            ].filter((extension) => {
                 if (this.props.disableExtensions) {
                     return !this.props.disableExtensions.includes(extension.name);
                 }
@@ -472,7 +472,7 @@ class RichMarkdownEditor extends React.PureComponent {
         if (!this.element) {
             throw new Error("createView called before ref available");
         }
-        const isEditingCheckbox = tr => {
+        const isEditingCheckbox = (tr) => {
             return tr.steps.some((step) => {
                 var _a, _b, _c;
                 return ((_c = (_b = (_a = step.slice) === null || _a === void 0 ? void 0 : _a.content) === null || _b === void 0 ? void 0 : _b.firstChild) === null || _c === void 0 ? void 0 : _c.type.name) ===
@@ -488,7 +488,7 @@ class RichMarkdownEditor extends React.PureComponent {
             dispatchTransaction: function (transaction) {
                 const { state, transactions } = this.state.applyTransaction(transaction);
                 this.updateState(state);
-                if (transactions.some(tr => tr.docChanged) &&
+                if (transactions.some((tr) => tr.docChanged) &&
                     (!self.props.readOnly ||
                         (self.props.readOnlyWriteCheckboxes &&
                             transactions.some(isEditingCheckbox)))) {
@@ -520,12 +520,12 @@ class RichMarkdownEditor extends React.PureComponent {
         return (React.createElement(Flex_1.default, { onKeyDown: onKeyDown, style: style, className: className, align: "flex-start", justify: "center", dir: dir, column: true },
             React.createElement(styled_components_1.ThemeProvider, { theme: this.theme() },
                 React.createElement(React.Fragment, null,
-                    React.createElement(editor_1.StyledEditor, { dir: dir, rtl: isRTL, readOnly: readOnly, readOnlyWriteCheckboxes: readOnlyWriteCheckboxes, ref: ref => (this.element = ref) }),
+                    React.createElement(editor_1.StyledEditor, { dir: dir, rtl: isRTL, readOnly: readOnly, readOnlyWriteCheckboxes: readOnlyWriteCheckboxes, ref: (ref) => (this.element = ref) }),
                     !readOnly && this.view && (React.createElement(React.Fragment, null,
                         React.createElement(SelectionToolbar_1.default, { view: this.view, dictionary: dictionary, commands: this.commands, rtl: isRTL, isTemplate: this.props.template === true, onOpen: this.handleOpenSelectionMenu, onClose: this.handleCloseSelectionMenu, onSearchLink: this.props.onSearchLink, onClickLink: this.props.onClickLink, onCreateLink: this.props.onCreateLink, tooltip: tooltip }),
                         React.createElement(LinkToolbar_1.default, { view: this.view, dictionary: dictionary, isActive: this.state.linkMenuOpen, onCreateLink: this.props.onCreateLink, onSearchLink: this.props.onSearchLink, onClickLink: this.props.onClickLink, onShowToast: this.props.onShowToast, onClose: this.handleCloseLinkMenu, tooltip: tooltip }),
                         React.createElement(EmojiMenu_1.default, { view: this.view, commands: this.commands, dictionary: dictionary, rtl: isRTL, isActive: this.state.emojiMenuOpen, search: this.state.blockMenuSearch, onClose: () => this.setState({ emojiMenuOpen: false }) }),
-                        React.createElement(BlockMenu_1.default, { view: this.view, commands: this.commands, dictionary: dictionary, rtl: isRTL, isActive: this.state.blockMenuOpen, search: this.state.blockMenuSearch, onClose: this.handleCloseBlockMenu, uploadImage: this.props.uploadImage, onLinkToolbarOpen: this.handleOpenLinkMenu, onImageUploadStart: this.props.onImageUploadStart, onImageUploadStop: this.props.onImageUploadStop, onShowToast: this.props.onShowToast, embeds: this.props.embeds })))))));
+                        React.createElement(BlockMenu_1.default, { view: this.view, commands: this.commands, dictionary: dictionary, rtl: isRTL, isActive: this.state.blockMenuOpen, search: this.state.blockMenuSearch, onClose: this.handleCloseBlockMenu, uploadMedia: this.props.uploadMedia, onLinkToolbarOpen: this.handleOpenLinkMenu, onImageUploadStart: this.props.onImageUploadStart, onImageUploadStop: this.props.onImageUploadStop, onShowToast: this.props.onShowToast, embeds: this.props.embeds })))))));
     }
 }
 RichMarkdownEditor.defaultProps = {
@@ -536,7 +536,7 @@ RichMarkdownEditor.defaultProps = {
     },
     onImageUploadStop: () => {
     },
-    onClickLink: href => {
+    onClickLink: (href) => {
         window.open(href, "_blank");
     },
     embeds: [],

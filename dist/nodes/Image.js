@@ -22,15 +22,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const React = __importStar(require("react"));
-const outline_icons_1 = require("outline-icons");
-const prosemirror_state_1 = require("prosemirror-state");
 const prosemirror_inputrules_1 = require("prosemirror-inputrules");
-const styled_components_1 = __importDefault(require("styled-components"));
+const prosemirror_state_1 = require("prosemirror-state");
 const re_resizable_1 = require("re-resizable");
+const React = __importStar(require("react"));
+const styled_components_1 = __importDefault(require("styled-components"));
+const insertFiles_1 = __importDefault(require("../commands/insertFiles"));
 const getDataTransferFiles_1 = __importDefault(require("../lib/getDataTransferFiles"));
 const uploadPlaceholder_1 = __importDefault(require("../lib/uploadPlaceholder"));
-const insertFiles_1 = __importDefault(require("../commands/insertFiles"));
+const isVideo_1 = __importStar(require("../queries/isVideo"));
 const Node_1 = __importDefault(require("./Node"));
 const IMAGE_INPUT_REGEX = /!\[(?<alt>[^\]\[]*?)]\((?<filename>[^\]\[]*?)(?=\“|\))\“?(?<layoutclass>[^\]\[\”]+)?\”?\)$/;
 const uploadPlugin = options => new prosemirror_state_1.Plugin({
@@ -38,7 +38,7 @@ const uploadPlugin = options => new prosemirror_state_1.Plugin({
         handleDOMEvents: {
             paste(view, event) {
                 if ((view.props.editable && !view.props.editable(view.state)) ||
-                    !options.uploadImage) {
+                    !options.uploadMedia) {
                     return false;
                 }
                 if (!event.clipboardData)
@@ -59,7 +59,7 @@ const uploadPlugin = options => new prosemirror_state_1.Plugin({
             },
             drop(view, event) {
                 if ((view.props.editable && !view.props.editable(view.state)) ||
-                    !options.uploadImage) {
+                    !options.uploadMedia) {
                     return false;
                 }
                 const files = getDataTransferFiles_1.default(event).filter(file => /image/i.test(file.type));
@@ -110,7 +110,8 @@ const downloadImageNode = async (node) => {
 const ImageBox = ({ src, alt, title, props, handleResize, defaultWidth, defaultHeight, readOnly, }) => {
     const [width, setWidth] = React.useState(defaultWidth || 150);
     const [height, setHeight] = React.useState(defaultHeight || 150);
-    const image = (React.createElement("img", { src: src, alt: alt, title: title, className: "personal-image", style: {
+    const isVideoUrl = isVideo_1.default(src);
+    const image = isVideoUrl ? (React.createElement("video", { style: { width: "100%", height: "100%" }, controls: true, src: isVideo_1.videoBlobFormat(src) })) : (React.createElement("img", { src: src, alt: alt, title: title, className: "personal-image", style: {
             width: "100%",
             height: "100%",
         } }));
@@ -193,8 +194,6 @@ class Image extends Node_1.default {
             const className = layoutClass ? `image image-${layoutClass}` : "image";
             return (React.createElement("div", { contentEditable: false, className: className },
                 React.createElement(ImageWrapper, { className: isSelected ? "ProseMirror-selectednode" : "", onMouseDown: this.handleSelect(props) },
-                    React.createElement(Button, null,
-                        React.createElement(outline_icons_1.DownloadIcon, { color: "currentColor", onClick: this.handleDownload(props) })),
                     React.createElement(ImageBox, { src: src, alt: alt, title: title, props: props, readOnly: this.editor.props.readOnly, defaultWidth: width, defaultHeight: height, handleResize: this.handleResize })),
                 React.createElement(Caption, { onKeyDown: this.handleKeyDown(props), onBlur: this.handleBlur(props), className: "caption", tabIndex: -1, role: "textbox", contentEditable: true, suppressContentEditableWarning: true, "data-caption": this.options.dictionary.imageCaptionPlaceholder }, alt)));
         };

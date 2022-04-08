@@ -1,19 +1,19 @@
-import * as React from "react";
-import { EditorState, Plugin } from "prosemirror-state";
-import { MarkdownParser, MarkdownSerializer } from "prosemirror-markdown";
-import { EditorView } from "prosemirror-view";
-import { Schema, NodeSpec, MarkSpec } from "prosemirror-model";
+import { PluginSimple } from "markdown-it";
 import { InputRule } from "prosemirror-inputrules";
-import baseDictionary from "./dictionary";
+import { MarkdownParser, MarkdownSerializer } from "prosemirror-markdown";
+import { MarkSpec, NodeSpec, Schema } from "prosemirror-model";
+import { EditorState, Plugin } from "prosemirror-state";
+import { EditorView } from "prosemirror-view";
+import * as React from "react";
 import { SearchResult } from "./components/LinkEditor";
-import { EmbedDescriptor, ToastType } from "./types";
 import Tooltip from "./components/Tooltip";
+import baseDictionary from "./dictionary";
+import ComponentView from "./lib/ComponentView";
 import Extension from "./lib/Extension";
 import ExtensionManager from "./lib/ExtensionManager";
-import ComponentView from "./lib/ComponentView";
-import { PluginSimple } from "markdown-it";
-export { schema, parser, serializer, renderToHtml } from "./server";
+import { EmbedDescriptor, ToastType } from "./types";
 export { default as Extension } from "./lib/Extension";
+export { parser, renderToHtml, schema, serializer } from "./server";
 export declare const theme: {
     background: string;
     text: string;
@@ -111,7 +111,7 @@ export declare type Props = {
     handleDOMEvents?: {
         [name: string]: (view: EditorView, event: Event) => boolean;
     };
-    uploadImage?: (file: File) => Promise<string>;
+    uploadMedia?: (file: File) => Promise<string>;
     onBlur?: () => void;
     onFocus?: () => void;
     onSave?: ({ done: boolean }: {
@@ -337,7 +337,7 @@ declare class RichMarkdownEditor extends React.PureComponent<Props, State> {
         heading: string;
         hr: string;
         image: string;
-        imageUploadError: string;
+        mediaUploadError: string;
         imageCaptionPlaceholder: string;
         info: string;
         infoNotice: string;
@@ -397,7 +397,7 @@ declare class RichMarkdownEditor extends React.PureComponent<Props, State> {
         heading: string;
         hr: string;
         image: string;
-        imageUploadError: string;
+        mediaUploadError: string;
         imageCaptionPlaceholder: string;
         info: string;
         infoNotice: string;

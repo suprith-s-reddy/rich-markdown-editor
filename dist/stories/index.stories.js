@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RTL = exports.Dark = exports.Focused = exports.Images = exports.Placeholder = exports.Persisted = exports.ReadOnlyWriteCheckboxes = exports.Checkboxes = exports.MaxLength = exports.ReadOnly = exports.Notices = exports.Code = exports.Marks = exports.Tables = exports.Blockquotes = exports.Lists = exports.Headings = exports.TemplateDoc = exports.Emoji = exports.Default = void 0;
-const index_1 = __importDefault(require("./index"));
+exports.RTL = exports.Dark = exports.Focused = exports.Media = exports.Placeholder = exports.Persisted = exports.ReadOnlyWriteCheckboxes = exports.Checkboxes = exports.MaxLength = exports.ReadOnly = exports.Notices = exports.Code = exports.Marks = exports.Tables = exports.Blockquotes = exports.Lists = exports.Headings = exports.TemplateDoc = exports.Emoji = exports.Default = void 0;
 const debounce_1 = __importDefault(require("lodash/debounce"));
 const react_1 = __importDefault(require("react"));
+const index_1 = __importDefault(require("./index"));
 exports.default = {
     title: "Editor",
     component: index_1.default,
@@ -27,7 +27,7 @@ exports.default = {
         disableExtensions: [],
     },
 };
-const Template = args => react_1.default.createElement(index_1.default, Object.assign({}, args));
+const Template = (args) => react_1.default.createElement(index_1.default, Object.assign({}, args));
 exports.Default = Template.bind({});
 exports.Default.args = {
     defaultValue: `# Welcome
@@ -175,7 +175,7 @@ exports.Persisted.args = {
         `# Persisted
   
 The contents of this editor are persisted to local storage on change (edit and reload)`,
-    onChange: debounce_1.default(value => {
+    onChange: debounce_1.default((value) => {
         const text = value();
         localStorage.setItem("saved", text);
     }, 250),
@@ -185,11 +185,12 @@ exports.Placeholder.args = {
     defaultValue: "",
     placeholder: "This is a custom placeholder…",
 };
-exports.Images = Template.bind({});
-exports.Images.args = {
-    defaultValue: `# Images
-![A caption](https://upload.wikimedia.org/wikipedia/commons/0/06/Davide-ragusa-gcDwzUGuUoI-unsplash.jpg?=243x295)`,
-    onChange: fn => {
+exports.Media = Template.bind({});
+exports.Media.args = {
+    defaultValue: `# Media
+![Photo caption](https://upload.wikimedia.org/wikipedia/commons/0/06/Davide-ragusa-gcDwzUGuUoI-unsplash.jpg?=243x295)
+![Video caption](https://ak.picdn.net/shutterstock/videos/1044255715/preview/stock-footage-person-signing-important-document-camera-following-tip-of-the-pen-as-it-signs-crucial-business.webm?=243x295)`,
+    onChange: (fn) => {
         console.log("VALUE: ", fn());
     },
 };

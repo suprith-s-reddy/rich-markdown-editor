@@ -18,16 +18,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const uploadPlaceholder_1 = __importStar(require("../lib/uploadPlaceholder"));
+const isVideo_1 = __importDefault(require("../queries/isVideo"));
 const types_1 = require("../types");
 const insertFiles = function (view, event, pos, files, options) {
-    const images = files.filter(file => /image/i.test(file.type));
-    if (images.length === 0)
+    const images = files.filter((file) => /image/i.test(file.type));
+    const videos = files.filter((file) => /video/i.test(file.type));
+    if (images.length === 0 && videos.length === 0)
         return;
-    const { dictionary, uploadImage, onImageUploadStart, onImageUploadStop, onShowToast, } = options;
-    if (!uploadImage) {
-        console.warn("uploadImage callback must be defined to handle image uploads.");
+    const { dictionary, uploadMedia, onImageUploadStart, onImageUploadStop, onShowToast, } = options;
+    if (!uploadMedia) {
+        console.warn("uploadMedia callback must be defined to handle image uploads.");
         return;
     }
     event.preventDefault();
@@ -35,17 +40,21 @@ const insertFiles = function (view, event, pos, files, options) {
         onImageUploadStart();
     const { schema } = view.state;
     let complete = 0;
-    for (const file of images) {
+    const validFile = !!videos.length ? videos : images;
+    for (const file of validFile) {
         const id = {};
         const { tr } = view.state;
         tr.setMeta(uploadPlaceholder_1.default, {
             add: { id, file, pos },
         });
         view.dispatch(tr);
-        uploadImage(file)
-            .then(src => {
-            const newImg = new Image();
-            newImg.onload = () => {
+        uploadMedia(file)
+            .then((src) => {
+            const isFileVideo = isVideo_1.default(src);
+            const newFile = isFileVideo
+                ? document.createElement("video")
+                : new Image();
+            const initFileLoad = () => {
                 const pos = uploadPlaceholder_1.findPlaceholder(view.state, id);
                 if (pos === null)
                     return;
@@ -54,19 +63,27 @@ const insertFiles = function (view, event, pos, files, options) {
                     .setMeta(uploadPlaceholder_1.default, { remove: { id } });
                 view.dispatch(transaction);
             };
-            newImg.onerror = error => {
-                throw error;
-            };
-            newImg.src = src;
+            if (isFileVideo) {
+                initFileLoad();
+                newFile.setAttribute("src", src);
+                newFile.setAttribute("controls", "controls");
+            }
+            else {
+                newFile.onload = initFileLoad;
+                newFile.onerror = (error) => {
+                    throw error;
+                };
+                newFile.src = src;
+            }
         })
-            .catch(error => {
+            .catch((error) => {
             console.error(error);
             const transaction = view.state.tr.setMeta(uploadPlaceholder_1.default, {
                 remove: { id },
             });
             view.dispatch(transaction);
             if (onShowToast) {
-                onShowToast(dictionary.imageUploadError, types_1.ToastType.Error);
+                onShowToast(dictionary.mediaUploadError, types_1.ToastType.Error);
             }
         })
             .finally(() => {

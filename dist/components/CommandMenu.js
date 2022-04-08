@@ -34,17 +34,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Wrapper = void 0;
-const React = __importStar(require("react"));
 const capitalize_1 = __importDefault(require("lodash/capitalize"));
-const react_portal_1 = require("react-portal");
 const prosemirror_utils_1 = require("prosemirror-utils");
+const React = __importStar(require("react"));
+const react_portal_1 = require("react-portal");
 const styled_components_1 = __importDefault(require("styled-components"));
+const insertFiles_1 = __importDefault(require("../commands/insertFiles"));
+const filterExcessSeparators_1 = __importDefault(require("../lib/filterExcessSeparators"));
+const getDataTransferFiles_1 = __importDefault(require("../lib/getDataTransferFiles"));
 const types_1 = require("../types");
 const Input_1 = __importDefault(require("./Input"));
 const VisuallyHidden_1 = __importDefault(require("./VisuallyHidden"));
-const getDataTransferFiles_1 = __importDefault(require("../lib/getDataTransferFiles"));
-const filterExcessSeparators_1 = __importDefault(require("../lib/filterExcessSeparators"));
-const insertFiles_1 = __importDefault(require("../commands/insertFiles"));
 const SSR = typeof window === "undefined";
 const defaultPosition = {
     left: -1000,
@@ -116,7 +116,7 @@ class CommandMenu extends React.Component {
                 this.close();
             }
         };
-        this.insertItem = item => {
+        this.insertItem = (item) => {
             var _a, _b;
             switch (item.name) {
                 case "image":
@@ -186,18 +186,18 @@ class CommandMenu extends React.Component {
                 this.inputRef.current.click();
             }
         };
-        this.triggerLinkInput = item => {
+        this.triggerLinkInput = (item) => {
             this.setState({ insertItem: item });
         };
-        this.handleImagePicked = event => {
+        this.handleImagePicked = (event) => {
             const files = getDataTransferFiles_1.default(event);
-            const { view, uploadImage, onImageUploadStart, onImageUploadStop, onShowToast, } = this.props;
+            const { view, uploadMedia, onImageUploadStart, onImageUploadStop, onShowToast, } = this.props;
             const { state } = view;
-            const parent = prosemirror_utils_1.findParentNode(node => !!node)(state.selection);
+            const parent = prosemirror_utils_1.findParentNode((node) => !!node)(state.selection);
             this.clearSearch();
             if (parent) {
                 insertFiles_1.default(view, event, parent.pos, files, {
-                    uploadImage,
+                    uploadMedia,
                     onImageUploadStart,
                     onImageUploadStop,
                     onShowToast,
@@ -318,7 +318,7 @@ class CommandMenu extends React.Component {
         }
     }
     get filtered() {
-        const { embeds = [], search = "", uploadImage, commands, filterable = true, } = this.props;
+        const { embeds = [], search = "", uploadMedia, commands, filterable = true, } = this.props;
         let items = this.props.items;
         const embedItems = [];
         for (const embed of embeds) {
@@ -332,7 +332,7 @@ class CommandMenu extends React.Component {
             });
             items = items.concat(embedItems);
         }
-        const filtered = items.filter(item => {
+        const filtered = items.filter((item) => {
             if (item.name === "separator")
                 return true;
             if (item.name &&
@@ -340,7 +340,7 @@ class CommandMenu extends React.Component {
                 !commands[`create${capitalize_1.default(item.name)}`]) {
                 return false;
             }
-            if (!uploadImage && item.name === "image")
+            if (!uploadMedia && item.name === "image")
                 return false;
             if (!search)
                 return !item.defaultHidden;
@@ -354,7 +354,7 @@ class CommandMenu extends React.Component {
         return filterExcessSeparators_1.default(filtered);
     }
     render() {
-        const { dictionary, isActive, uploadImage } = this.props;
+        const { dictionary, isActive, uploadMedia } = this.props;
         const items = this.filtered;
         const _a = this.state, { insertItem } = _a, positioning = __rest(_a, ["insertItem"]);
         return (React.createElement(react_portal_1.Portal, null,
@@ -379,8 +379,8 @@ class CommandMenu extends React.Component {
                     }),
                     items.length === 0 && (React.createElement(ListItem, null,
                         React.createElement(Empty, null, dictionary.noResults))))),
-                uploadImage && (React.createElement(VisuallyHidden_1.default, null,
-                    React.createElement("input", { type: "file", ref: this.inputRef, onChange: this.handleImagePicked, accept: "image/*" }))))));
+                uploadMedia && (React.createElement(VisuallyHidden_1.default, null,
+                    React.createElement("input", { type: "file", ref: this.inputRef, onChange: this.handleImagePicked, accept: "image/*, video/*" }))))));
     }
 }
 const LinkInputWrapper = styled_components_1.default.div `
@@ -389,7 +389,7 @@ const LinkInputWrapper = styled_components_1.default.div `
 const LinkInput = styled_components_1.default(Input_1.default) `
   height: 36px;
   width: 100%;
-  color: ${props => props.theme.blockToolbarText};
+  color: ${(props) => props.theme.blockToolbarText};
 `;
 const List = styled_components_1.default.ol `
   list-style: none;
@@ -405,21 +405,21 @@ const ListItem = styled_components_1.default.li `
 const Empty = styled_components_1.default.div `
   display: flex;
   align-items: center;
-  color: ${props => props.theme.textSecondary};
+  color: ${(props) => props.theme.textSecondary};
   font-weight: 500;
   font-size: 14px;
   height: 36px;
   padding: 0 16px;
 `;
 exports.Wrapper = styled_components_1.default.div `
-  color: ${props => props.theme.text};
-  font-family: ${props => props.theme.fontFamily};
+  color: ${(props) => props.theme.text};
+  font-family: ${(props) => props.theme.fontFamily};
   position: absolute;
-  z-index: ${props => props.theme.zIndex + 100};
-  ${props => props.top !== undefined && `top: ${props.top}px`};
-  ${props => props.bottom !== undefined && `bottom: ${props.bottom}px`};
-  left: ${props => props.left}px;
-  background-color: ${props => props.theme.blockToolbarBackground};
+  z-index: ${(props) => props.theme.zIndex + 100};
+  ${(props) => props.top !== undefined && `top: ${props.top}px`};
+  ${(props) => props.bottom !== undefined && `bottom: ${props.bottom}px`};
+  left: ${(props) => props.left}px;
+  background-color: ${(props) => props.theme.blockToolbarBackground};
   border-radius: 4px;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px,
     rgba(0, 0, 0, 0.08) 0px 4px 8px, rgba(0, 0, 0, 0.08) 0px 2px 4px;
@@ -444,7 +444,7 @@ exports.Wrapper = styled_components_1.default.div `
   hr {
     border: 0;
     height: 0;
-    border-top: 1px solid ${props => props.theme.blockToolbarDivider};
+    border-top: 1px solid ${(props) => props.theme.blockToolbarDivider};
   }
 
   ${({ active, isAbove }) => active &&
